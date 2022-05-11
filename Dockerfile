@@ -5,7 +5,7 @@ WORKDIR /usr/src/app
 COPY pip-requirements.txt ./
 RUN pip install --no-cache-dir -r pip-requirements.txt
 
-COPY pve_node_exporter_discovery.py ./
+COPY pve-node-discovery.py ./
 
-EXPOSE 24684
-CMD [ "python", "./pve_node_exporter_discovery.py" ]
+EXPOSE 9951
+ENTRYPOINT [ "python", "./pve-node-discovery.py" ]

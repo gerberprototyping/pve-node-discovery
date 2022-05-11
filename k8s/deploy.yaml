@@ -1,31 +1,31 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: pve_node_exporter_discovery
+  name: pve-node-discovery
   labels:
-    app: pve_node_exporter_discovery-exporter
+    app: pve-node-discovery
 spec:
   replicas: 1
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      app: pve_node_exporter_discovery
+      app: pve-node-discovery
   template:
     metadata:
       labels:
-        app: pve_node_exporter_discovery
+        app: pve-node-discovery
     spec:
       containers:
-        - name: pve_node_exporter_discovery
-          image: 14agerber/pve_node_exporter_discovery:latest
+        - name: pve-node-discovery
+          image: 14agerber/pve-node-discovery:1.1.3
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 24684
+            - containerPort: 9951
               protocol: TCP
           livenessProbe:
             httpGet:
               path: /healthz
-              port: 24684
+              port: 9951
               scheme: HTTP
             initialDelaySeconds: 60
             timeoutSeconds: 30
@@ -35,7 +35,7 @@ spec:
           readinessProbe:
             httpGet:
               path: /healthz
-              port: 24684
+              port: 9951
               scheme: HTTP
             timeoutSeconds: 1
             periodSeconds: 5
@@ -48,12 +48,12 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
-  name: pve_node_exporter_discovery
+  name: pve-node-discovery
   labels:
-    app: pve_node_exporter_discovery
+    app: pve-node-discovery
 spec:
   ports:
-    - port: 24684
-      targetPort: 24684
+    - port: 9951
+      targetPort: 9951
   selector:
-    app: pve_node_exporter_discovery
+    app: pve-node-discovery
