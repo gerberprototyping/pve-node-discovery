@@ -22,7 +22,7 @@ def findMetricByID(id:str, metrics:json) -> json:
             return metric
 
 
-def getGuests(prometheus:str):
+def getGuests(prometheus:str) -> json:
     response = requests.get(
         prometheus+'/api/v1/query',
         params={'query': 'pve_guest_info'}
@@ -37,7 +37,7 @@ def getGuests(prometheus:str):
     for guest in pve_guest_info:
         id = guest['metric']['id']
         if '0' != findMetricByID(id, pve_up)['value'][1]:
-            guests.append(guest['metric']['name'])
+            guests.append(guest['metric'])
     return guests
 
 
@@ -131,16 +131,21 @@ def webroot():
     try:
         static_configs = []
         for guest in getGuests(PARAMS['prometheus-url']):
-            if not guest in PARAMS['exclude']:
-                dns_name = guest
-                if guest in PARAMS['map-from']:
-                    index = PARAMS['map-from'].index(guest)
+            if not guest['name'] in PARAMS['exclude']:
+                dns_name = guest['name']
+                if guest['name'] in PARAMS['map-from']:
+                    index = PARAMS['map-from'].index(guest['name'])
                     dns_name = PARAMS['map-to'][index]
                 targets = [
                     dns_name+PARAMS['guest-domain']+':'+PARAMS['guest-port']
                 ]
                 labels = {
-                    'name': guest,
+                    'pve_id': guest['id'],
+                    'pve_instance': guest['instance'],
+                    'pve_job': guest['job'],
+                    'name': guest['name'],
+                    'pve_node': guest['node'],
+                    'pve_type': guest['type'],
                 }
                 static_configs.append({
                     'targets': targets,
